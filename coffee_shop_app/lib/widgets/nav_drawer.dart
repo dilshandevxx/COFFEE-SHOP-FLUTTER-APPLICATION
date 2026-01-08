@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:coffee_shop_app/screens/profile_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class NavDrawer extends StatelessWidget {
@@ -39,9 +40,13 @@ class NavDrawer extends StatelessWidget {
           ),
 
           // Menu Items
+          // Menu Items
           const SizedBox(height: 10),
           _buildListTile(Icons.home, "Home", () => Navigator.pop(context)),
-          _buildListTile(Icons.person, "Profile", () {}),
+          _buildListTile(Icons.person, "Profile", () {
+             Navigator.pop(context); // Close drawer
+             Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileScreen()));
+          }),
           _buildListTile(Icons.shopping_cart, "Orders", () {}),
           _buildListTile(Icons.settings, "Settings", () {}),
           
