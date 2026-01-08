@@ -1,5 +1,6 @@
 import 'package:coffee_shop_app/models/cart_model.dart';
 import 'package:coffee_shop_app/models/coffee_item.dart';
+import 'package:coffee_shop_app/screens/payment_success_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -96,8 +97,25 @@ class CartScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 20),
-                    GestureDetector( // Make it tappable if we had payment logic
-                      onTap: () {},
+                    GestureDetector(
+                      onTap: () async {
+                         // Simulate processing
+                         showDialog(
+                           context: context, 
+                           barrierDismissible: false,
+                           builder: (context) => const Center(child: CircularProgressIndicator(color: Colors.orange)),
+                         );
+                         
+                         await Future.delayed(const Duration(seconds: 2));
+                         
+                         if (context.mounted) {
+                           Navigator.pop(context); // Close dialog
+                           Navigator.push(
+                             context,
+                             MaterialPageRoute(builder: (context) => const PaymentSuccessScreen()),
+                           );
+                         }
+                      },
                       child: Container(
                         padding: const EdgeInsets.all(20),
                         width: double.infinity,

@@ -1,5 +1,6 @@
 import 'package:coffee_shop_app/models/cart_model.dart';
 import 'package:coffee_shop_app/models/coffee_item.dart';
+import 'package:coffee_shop_app/screens/payment_success_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -13,16 +14,27 @@ class DetailsScreen extends StatefulWidget {
 }
 
 class _DetailsScreenState extends State<DetailsScreen> {
-  void addToCart() {
+
+  void addToCart() async { // Changed to async
+    // Add to cart in background so data exists
     Provider.of<CartModel>(context, listen: false).addItemToCart(widget.coffee);
+    
+    // Direct "Buy Now" flow
     showDialog(
-      context: context,
-      builder: (context) => const AlertDialog(
-        backgroundColor: Colors.grey, // Darker dialog
-        title: Text("Successfully added!", style: TextStyle(color: Colors.white)),
-        content: Text("Check your cart", style: TextStyle(color: Colors.white)),
-      ),
+      context: context, 
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator(color: Colors.orange)),
     );
+    
+    await Future.delayed(const Duration(seconds: 1)); // Faster than cart checkout
+    
+    if (context.mounted) {
+      Navigator.pop(context); // Close loader
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const PaymentSuccessScreen()),
+      );
+    }
   }
 
   @override
@@ -40,13 +52,16 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     bottomLeft: Radius.circular(30),
                     bottomRight: Radius.circular(30),
                   ),
-                  child: Image.network(
-                    widget.coffee.imageUrl,
-                    height: 400,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        Container(height: 400, color: Colors.grey[800], child: const Icon(Icons.coffee, size: 200, color: Colors.brown)),
+                  child: Hero(
+                    tag: widget.coffee.name,
+                    child: Image.network(
+                      widget.coffee.imageUrl,
+                      height: 400,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          Container(height: 400, color: Colors.grey[800], child: const Icon(Icons.coffee, size: 200, color: Colors.brown)),
+                    ),
                   ),
                 ),
                 SafeArea(

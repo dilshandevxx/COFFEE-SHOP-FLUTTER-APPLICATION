@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:coffee_shop_app/screens/orders_screen.dart';
 import 'package:coffee_shop_app/screens/profile_screen.dart';
+import 'package:coffee_shop_app/screens/settings_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class NavDrawer extends StatelessWidget {
@@ -47,8 +49,14 @@ class NavDrawer extends StatelessWidget {
              Navigator.pop(context); // Close drawer
              Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileScreen()));
           }),
-          _buildListTile(Icons.shopping_cart, "Orders", () {}),
-          _buildListTile(Icons.settings, "Settings", () {}),
+          _buildListTile(Icons.shopping_cart, "Orders", () {
+             Navigator.pop(context); // Close drawer
+             Navigator.push(context, MaterialPageRoute(builder: (context) => const OrdersScreen()));
+          }),
+          _buildListTile(Icons.settings, "Settings", () {
+             Navigator.pop(context); // Close drawer
+             Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsScreen()));
+          }),
           
           const Spacer(),
           

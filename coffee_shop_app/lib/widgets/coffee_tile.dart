@@ -20,7 +20,7 @@ class CoffeeTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(8), // Reduced padding
         decoration: BoxDecoration(
-          color: Colors.grey[800],
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
         ),
         child: SingleChildScrollView(
@@ -31,13 +31,16 @@ class CoffeeTile extends StatelessWidget {
               // Coffee Image
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  coffee.imageUrl,
-                  height: 90, 
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      Container(height: 90, color: Colors.grey[700], child: const Icon(Icons.coffee, color: Colors.brown)),
+                child: Hero(
+                  tag: coffee.name,
+                  child: Image.network(
+                    coffee.imageUrl,
+                    height: 90, 
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        Container(height: 90, color: Colors.grey[700], child: const Icon(Icons.coffee, color: Colors.brown)),
+                  ),
                 ),
               ),
         
@@ -48,7 +51,7 @@ class CoffeeTile extends StatelessWidget {
                   children: [
                     Text(
                       coffee.name,
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodyLarge?.color),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -71,7 +74,7 @@ class CoffeeTile extends StatelessWidget {
                     text: TextSpan(
                       children: [
                         const TextSpan(text: '\$ ', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
-                        TextSpan(text: coffee.price.toString(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+                        TextSpan(text: coffee.price.toString(), style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color, fontWeight: FontWeight.bold, fontSize: 18)),
                       ],
                     ),
                   ),

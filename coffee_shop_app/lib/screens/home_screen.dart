@@ -48,9 +48,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[900],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       drawer: const NavDrawer(),
       appBar: AppBar(
+        // title: Text("Brew Day V2", ...), removed
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: Builder(
@@ -92,7 +93,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                   decoration: BoxDecoration(
-                    color: Colors.grey[900]!.withOpacity(0.8),
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey[900]!.withOpacity(0.8) 
+                        : Colors.white.withOpacity(0.8), // Dynamic Glass Color
                     borderRadius: BorderRadius.circular(25),
                     border: Border.all(color: Colors.white.withOpacity(0.1)),
                     boxShadow: [
@@ -172,9 +175,13 @@ class ShopPage extends StatefulWidget {
 }
 
 class _ShopPageState extends State<ShopPage> {
+  // Search Controller
+  final TextEditingController _searchController = TextEditingController();
+
    // Category selection
   final List<List<dynamic>> coffeeType = [
-    ['Cappuccino', true],
+    ['All', true],
+    ['Cappuccino', false],
     ['Latte', false],
     ['Espresso', false],
     ['Flat White', false],
@@ -187,6 +194,27 @@ class _ShopPageState extends State<ShopPage> {
       }
       coffeeType[index][1] = true;
     });
+  }
+
+  // Filter Logic
+  List<CoffeeItem> _getFilteredCoffees(List<CoffeeItem> allCoffees) {
+    String searchText = _searchController.text.toLowerCase();
+    String selectedCategory = coffeeType.firstWhere((element) => element[1] == true)[0];
+
+    return allCoffees.where((coffee) {
+      // 1. Filter by Name (Search)
+      bool matchesSearch = coffee.name.toLowerCase().contains(searchText);
+
+      // 2. Filter by Category
+      bool matchesCategory = true;
+      if (selectedCategory != 'All') {
+        // Simple matching logic: Check if name contains category (e.g. "Latte" in "Iced Latte")
+        // Ideally, CoffeeItem should have a 'category' field.
+        matchesCategory = coffee.name.toLowerCase().contains(selectedCategory.toLowerCase());
+      }
+
+      return matchesSearch && matchesCategory;
+    }).toList();
   }
 
   void runAddToCartAnimation(BuildContext widgetContext, String imageUrl) async {
@@ -238,6 +266,8 @@ class _ShopPageState extends State<ShopPage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 25.0),
             child: TextField(
+              controller: _searchController, // Linked controller
+              onChanged: (value) => setState(() {}), // Rebuild on typing
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.search, color: Colors.orange),
                 hintText: 'Find your coffee..',
@@ -282,6 +312,9 @@ class _ShopPageState extends State<ShopPage> {
           Expanded(
             child: Consumer<CartModel>(
               builder: (context, value, child) {
+                // Get Filtered List
+                List<CoffeeItem> filteredItems = _getFilteredCoffees(value.shopItems);
+
                 return GridView.builder(
                   padding: const EdgeInsets.only(left: 25, right: 25, bottom: 100),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -290,9 +323,9 @@ class _ShopPageState extends State<ShopPage> {
                     crossAxisSpacing: 20,
                     mainAxisSpacing: 20,
                   ),
-                  itemCount: value.shopItems.length,
+                  itemCount: filteredItems.length,
                   itemBuilder: (context, index) {
-                    CoffeeItem coffee = value.shopItems[index];
+                    CoffeeItem coffee = filteredItems[index];
                     return CoffeeTile(
                       coffee: coffee,
                       onPressed: (BuildContext btnContext) { // Received context here!

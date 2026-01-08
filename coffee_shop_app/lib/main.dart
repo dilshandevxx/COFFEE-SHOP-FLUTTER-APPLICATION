@@ -2,6 +2,7 @@ import 'package:coffee_shop_app/models/cart_model.dart';
 import 'package:coffee_shop_app/screens/cart_screen.dart';
 import 'package:coffee_shop_app/screens/home_screen.dart';
 import 'package:coffee_shop_app/screens/intro_screen.dart';
+import 'package:coffee_shop_app/providers/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -15,18 +16,22 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => CartModel(),
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Coffee Shop App',
-        theme: ThemeData(
-          brightness: Brightness.dark,
-          primarySwatch: Colors.orange,
-          scaffoldBackgroundColor: Colors.grey[900],
-          textTheme: GoogleFonts.soraTextTheme(ThemeData.dark().textTheme),
-        ),
-        home: const IntroScreen(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => CartModel()),
+        ChangeNotifierProvider(create: (context) => ThemeProvider()),
+      ],
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'Coffee Shop App',
+            theme: ThemeProvider.lightTheme,
+            darkTheme: ThemeProvider.darkTheme,
+            themeMode: themeProvider.themeMode,
+            home: const IntroScreen(),
+          );
+        },
       ),
     );
   }
